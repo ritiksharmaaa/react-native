@@ -5,13 +5,14 @@ This repository is dedicated to learning React Native core concepts while buildi
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Permissions System](#permissions-system)
-3. [Build Process](#build-process)
-4. [Over-the-Air (OTA) Updates](#over-the-air-ota-updates)
-5. [Storage and Data Persistence](#storage-and-data-persistence)
-6. [Native Modules and Bridges](#native-modules-and-bridges)
-7. [Performance Optimization](#performance-optimization)
-8. [Debugging and Development Tools](#debugging-and-development-tools)
+2. [Expo vs Bare React Native](#expo-vs-bare-react-native)
+3. [Permissions System](#permissions-system)
+4. [Build Process](#build-process)
+5. [Over-the-Air (OTA) Updates](#over-the-air-ota-updates)
+6. [Storage and Data Persistence](#storage-and-data-persistence)
+7. [Native Modules and Bridges](#native-modules-and-bridges)
+8. [Performance Optimization](#performance-optimization)
+9. [Debugging and Development Tools](#debugging-and-development-tools)
 
 ---
 
@@ -27,13 +28,73 @@ This guide focuses on these core React Native concepts.
 
 ---
 
+## Expo vs Bare React Native
+
+Before diving into the details, it's important to understand the two main approaches to React Native development:
+
+### Bare React Native (React Native CLI)
+
+**What it is:**
+- The "standard" React Native setup using `npx react-native init`
+- Full access to native Android and iOS code
+- Requires native build tools (Android Studio/Xcode)
+- More control and flexibility
+
+**Pros:**
+- ✅ Complete control over native code
+- ✅ Can use any native library
+- ✅ No limitations on native features
+- ✅ Better for learning the full stack
+
+**Cons:**
+- ❌ Requires Android Studio (~4-6GB) or Android SDK
+- ❌ Requires Xcode (~15GB on macOS)
+- ❌ More complex setup
+- ❌ Steeper learning curve
+
+### Expo (Managed Workflow)
+
+**What it is:**
+- A framework built on top of React Native
+- Pre-configured build pipeline (EAS Build)
+- Can build apps in the cloud without local native tools
+- Simplified development experience
+
+**Pros:**
+- ✅ No need for Android Studio or Xcode
+- ✅ Cloud builds with EAS Build (works on 8GB RAM machines)
+- ✅ Faster to get started
+- ✅ Built-in libraries for common features
+- ✅ Perfect for learning without heavy tooling
+
+**Cons:**
+- ❌ Some limitations on native modules (though ejecting is possible)
+- ❌ Slightly larger app size
+- ❌ Less control over native build process
+
+### Which Should You Choose?
+
+**For learning React Native concepts (like you):**
+- Start with **Expo** if you have limited RAM (8GB)
+- Use **EAS Build** for cloud building (no Android Studio needed)
+- Learn the concepts first, then understand how they work in bare React Native
+- This guide covers **both approaches** so you understand the full flow
+
+**This guide's approach:**
+- Shows **standard/bare React Native** methods first (for learning the full flow)
+- Includes **Expo alternatives** and **lightweight methods** for low-RAM machines
+- Explains **cloud build options** that don't require bulky SDKs
+- Look for 💡 **Low-RAM Alternative** sections throughout
+
+---
+
 ## Permissions System
 
 Mobile apps need explicit user permission to access sensitive features. React Native provides ways to request and handle permissions.
 
-### Using `react-native-permissions` Library
+### Bare React Native: Using `react-native-permissions` Library
 
-The most comprehensive library for handling permissions is `react-native-permissions`.
+The most comprehensive library for handling permissions in bare React Native is `react-native-permissions`.
 
 #### Installation
 
@@ -241,11 +302,158 @@ const requestMultiplePermissions = async () => {
 };
 ```
 
+---
+
+### 💡 Expo Alternative: Built-in Permission APIs
+
+If you're using **Expo**, many permissions are built-in with simpler APIs:
+
+#### Installation
+
+```bash
+# Camera
+npx expo install expo-camera
+
+# Location
+npx expo install expo-location
+
+# Media Library
+npx expo install expo-media-library
+
+# Contacts
+npx expo install expo-contacts
+
+# Notifications
+npx expo install expo-notifications
+```
+
+#### Code Examples
+
+**Camera Permission (Expo):**
+
+```javascript
+import { Camera } from 'expo-camera';
+
+const requestCameraPermission = async () => {
+  const { status } = await Camera.requestCameraPermissionsAsync();
+  return status === 'granted';
+};
+
+// Check without requesting
+const { status } = await Camera.getCameraPermissionsAsync();
+```
+
+**Location Permission (Expo):**
+
+```javascript
+import * as Location from 'expo-location';
+
+const requestLocationPermission = async () => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  return status === 'granted';
+};
+
+// Get location
+const location = await Location.getCurrentPositionAsync({});
+```
+
+**Notification Permission (Expo):**
+
+```javascript
+import * as Notifications from 'expo-notifications';
+
+const requestNotificationPermission = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status === 'granted';
+};
+```
+
+**Media Library Permission (Expo):**
+
+```javascript
+import * as MediaLibrary from 'expo-media-library';
+
+const requestMediaLibraryPermission = async () => {
+  const { status } = await MediaLibrary.requestPermissionsAsync();
+  return status === 'granted';
+};
+```
+
+**Contacts Permission (Expo):**
+
+```javascript
+import * as Contacts from 'expo-contacts';
+
+const requestContactsPermission = async () => {
+  const { status } = await Contacts.requestPermissionsAsync();
+  return status === 'granted';
+};
+```
+
+**Configuration in `app.json` (Expo):**
+
+```json
+{
+  "expo": {
+    "name": "Your App",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff"
+        }
+      ]
+    ],
+    "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take photos.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your photos.",
+        "NSLocationWhenInUseUsageDescription": "This app uses your location."
+      }
+    },
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    }
+  }
+}
+```
+
+**Benefits of Expo Permissions:**
+- ✅ Simpler API (one-line permission requests)
+- ✅ Automatic platform handling
+- ✅ Config-based permission setup
+- ✅ No need to edit native files manually
+- ✅ Works with EAS Build (no Android Studio needed)
+
+**When to Use Each:**
+- **Expo APIs**: If using Expo and want simplicity
+- **react-native-permissions**: If using bare React Native or need more control
+
+---
+
 ### Sensor Access
 
 React Native provides access to various device sensors:
 
-#### Accelerometer & Gyroscope
+#### Accelerometer & Gyroscope (Bare React Native)
 
 ```bash
 npm install react-native-sensors
@@ -269,13 +477,58 @@ subscription.unsubscribe();
 gyroSubscription.unsubscribe();
 ```
 
+#### 💡 Expo Alternative: Device Motion & Sensors
+
+```bash
+npx expo install expo-sensors
+```
+
+```javascript
+import { Accelerometer, Gyroscope, Magnetometer } from 'expo-sensors';
+
+// Accelerometer
+Accelerometer.setUpdateInterval(100);
+const subscription = Accelerometer.addListener(({ x, y, z }) => {
+  console.log('Accelerometer:', x, y, z);
+});
+
+// Gyroscope
+const gyroSubscription = Gyroscope.addListener(({ x, y, z }) => {
+  console.log('Gyroscope:', x, y, z);
+});
+
+// Clean up
+subscription.remove();
+gyroSubscription.remove();
+```
+
 ---
 
 ## Build Process
 
 Understanding how your JavaScript code becomes a native app is crucial.
 
+### Approach Overview
+
+This guide covers **three approaches** to building React Native apps:
+
+1. **Standard Approach** (with Android Studio/Xcode) - Best for learning the full flow
+2. **Lightweight Approach** (Command-line tools only) - For low-RAM machines (8GB)
+3. **Cloud Build Approach** (EAS Build for Expo) - No local SDKs needed
+
+Choose based on your machine specs and learning goals.
+
+---
+
 ### Android - Building APK/AAB
+
+#### Standard Approach (with Android Studio)
+
+**What You Need:**
+- **JDK** (Java Development Kit) 11 or higher
+- **Android Studio** (~4-6GB download, needs 8GB+ RAM)
+- **Gradle** (comes with React Native)
+- **Signing keystore** for release builds
 
 #### Debug Build (for testing)
 
@@ -345,17 +598,141 @@ cd android
 # Output: android/app/build/outputs/bundle/release/app-release.aab
 ```
 
-#### What You Need for Android:
+---
 
+#### 💡 Low-RAM Alternative: Command-Line Tools Only (Without Android Studio)
+
+If you have **8GB RAM or less** and can't install Android Studio, you can use Android SDK command-line tools:
+
+**Step 1: Install Android SDK Command-Line Tools**
+
+```bash
+# Download SDK command-line tools
+# Visit: https://developer.android.com/studio#command-tools
+# Download "Command line tools only" (~100MB vs 4-6GB for Android Studio)
+
+# Extract to a location, e.g., ~/Android/cmdline-tools
+
+# Set environment variables in ~/.bashrc or ~/.zshrc
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+**Step 2: Install Required SDK Packages**
+
+```bash
+# Accept licenses
+sdkmanager --licenses
+
+# Install minimal required packages (much smaller than Android Studio)
+sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
+# Install system image for emulator (optional, only if you want to test)
+sdkmanager "system-images;android-33;google_apis;x86_64"
+```
+
+**Step 3: Build APK**
+
+```bash
+# Same commands as standard approach
+cd android
+./gradlew assembleDebug
+# or
+./gradlew assembleRelease
+```
+
+**Benefits:**
+- ✅ ~500MB download vs ~6GB for Android Studio
+- ✅ Uses less RAM during builds
+- ✅ Same build output as Android Studio
+- ✅ Learn the actual build process without IDE
+
+**Limitations:**
+- ❌ No visual IDE (use VS Code instead)
+- ❌ No emulator GUI (can use physical device)
+- ❌ More command-line work
+
+---
+
+#### 💡 Cloud Build Alternative: EAS Build (Expo)
+
+For **Expo projects**, you can build in the cloud without any Android SDK:
+
+**Step 1: Install EAS CLI**
+
+```bash
+npm install -g eas-cli
+```
+
+**Step 2: Configure EAS**
+
+```bash
+# Login to Expo account (free tier available)
+eas login
+
+# Configure project
+eas build:configure
+```
+
+**Step 3: Build in Cloud**
+
+```bash
+# Build APK for Android
+eas build --platform android --profile preview
+
+# Build AAB for Play Store
+eas build --platform android --profile production
+
+# Builds happen on Expo's servers
+# Downloads APK/AAB when complete (~10-15 minutes)
+```
+
+**Benefits:**
+- ✅ No Android SDK installation needed
+- ✅ Works on any machine (even 4GB RAM)
+- ✅ Builds on Expo's cloud servers
+- ✅ Free tier available (limited builds/month)
+- ✅ Perfect for learning without heavy tools
+
+**Costs:**
+- Free tier: ~30 builds/month
+- Paid plans: Unlimited builds (~$29/month for hobbyists)
+
+**Use Case:**
+- Perfect for 8GB RAM machines
+- Great for learning and testing
+- Can upgrade to bare workflow later
+
+---
+
+#### Requirements Summary
+
+**Standard Approach:**
 - **JDK** (Java Development Kit) 11 or higher
-- **Android Studio** or Android SDK
+- **Android Studio** (~6GB) or Android SDK (~500MB command-line tools)
 - **Gradle** (comes with React Native)
 - **Signing keystore** for release builds
+- **8GB+ RAM recommended** for Android Studio
 - **Google Play Developer Account** ($25 one-time fee) for publishing
+
+**Low-RAM Alternative (Command-Line Tools):**
+- **JDK** 11 or higher
+- **Android SDK command-line tools** (~500MB)
+- **4-8GB RAM** sufficient
+- **Signing keystore** for release builds
+
+**Cloud Build Alternative (EAS/Expo):**
+- **Node.js** and **EAS CLI**
+- **Expo account** (free tier available)
+- **Any machine** (even 4GB RAM works)
+- **Internet connection** for cloud builds
+
+---
 
 ### iOS - Building IPA
 
-#### Prerequisites
+#### Standard Approach (with Xcode)
 
 - **macOS** (iOS builds only work on Mac)
 - **Xcode** (free from Mac App Store)
@@ -403,21 +780,93 @@ open ios/YourApp.xcworkspace
    - Choose distribution method (App Store, Ad Hoc, Enterprise)
    - Follow the wizard to export IPA
 
-#### What You Need for iOS:
+---
 
-- **macOS** computer
-- **Xcode** (free)
+#### 💡 Cloud Build Alternative: EAS Build (Expo)
+
+**For users WITHOUT macOS** or with limited RAM:
+
+```bash
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login
+eas login
+
+# Configure project
+eas build:configure
+
+# Build iOS in cloud (no Mac needed!)
+eas build --platform ios --profile preview
+
+# Submit to App Store (optional)
+eas submit --platform ios
+```
+
+**Benefits:**
+- ✅ Build iOS apps **without a Mac**
+- ✅ No Xcode installation needed (~15GB)
+- ✅ Builds on Expo's macOS servers
+- ✅ Works on Windows/Linux/Low-spec machines
+
+**Requirements:**
+- Still need **Apple Developer Account** ($99/year) for distribution
+- EAS free tier: ~30 builds/month
+- Build time: ~15-20 minutes per build
+
+---
+
+#### Requirements Summary
+
+**Standard Approach (with Xcode):**
+- **macOS** computer (required)
+- **Xcode** (~15GB)
 - **CocoaPods** for dependencies
+- **8GB+ RAM recommended**
 - **Apple Developer Account** ($99/year)
 - **Provisioning profiles** and **certificates**
 - **App Store Connect** account for publishing
 
+**Cloud Build Alternative (EAS/Expo):**
+- **Any OS** (Windows/Linux/macOS)
+- **No Xcode** needed
+- **EAS CLI** and **Expo account**
+- **Apple Developer Account** ($99/year) still required
+- **Any machine** (even 4GB RAM works)
+- **Internet connection** for cloud builds
+
+---
+
 ### Build Comparison
 
-| Platform | Debug Command | Release Output | Required For Publishing |
-|----------|--------------|----------------|------------------------|
-| Android | `cd android && ./gradlew assembleDebug` | APK/AAB | Google Play Console |
-| iOS | `npx react-native run-ios` | IPA | App Store Connect |
+| Approach | Platform | RAM Required | SDK Size | Machine | Build Time | Best For |
+|----------|----------|--------------|----------|---------|------------|----------|
+| **Standard (Android Studio)** | Android | 8GB+ | ~6GB | Any OS | 2-5 min | Full learning |
+| **CLI Tools Only** | Android | 4-8GB | ~500MB | Any OS | 2-5 min | Low RAM |
+| **EAS Build** | Android | Any | 0 (cloud) | Any OS | 10-15 min | Easiest |
+| **Standard (Xcode)** | iOS | 8GB+ | ~15GB | macOS only | 5-10 min | Full learning |
+| **EAS Build** | iOS | Any | 0 (cloud) | Any OS | 15-20 min | No Mac needed |
+
+**Quick Commands:**
+
+```bash
+# Bare React Native (Standard)
+npx react-native run-android          # Android debug
+cd android && ./gradlew assembleRelease  # Android release
+npx react-native run-ios              # iOS debug (macOS only)
+
+# Bare React Native (CLI Tools Only - same as standard)
+cd android && ./gradlew assembleDebug    # Uses command-line SDK
+
+# Expo (Cloud Build)
+eas build --platform android          # Android cloud build
+eas build --platform ios              # iOS cloud build (no Mac!)
+
+# Expo (Local Development)
+npx expo start                        # Start dev server
+npx expo run:android                  # Run on Android
+npx expo run:ios                      # Run on iOS (macOS only)
+```
 
 ---
 
@@ -1109,6 +1558,8 @@ npx react-native log-ios
 
 ## Common Commands Cheat Sheet
 
+### Bare React Native
+
 ```bash
 # Create new React Native project
 npx react-native init MyApp
@@ -1143,6 +1594,203 @@ npx react-native start --reset-cache
 # Check React Native info
 npx react-native info
 ```
+
+### Expo Commands
+
+```bash
+# Create new Expo project
+npx create-expo-app MyApp
+
+# Start development server
+npx expo start
+
+# Run on Android (requires Android device/emulator)
+npx expo run:android
+
+# Run on iOS (requires macOS and iOS simulator)
+npx expo run:ios
+
+# Build for Android (cloud build - no SDK needed)
+eas build --platform android
+
+# Build for iOS (cloud build - no Mac needed)
+eas build --platform ios
+
+# Submit to stores
+eas submit --platform android
+eas submit --platform ios
+
+# Check Expo info
+npx expo-doctor
+```
+
+---
+
+## Practical Guide for 8GB RAM / Low-Spec Machines
+
+**Your Situation:** You're using Expo, have 8GB RAM, can't install Android Studio, but want to learn the entire flow (not just Expo-specific).
+
+### Recommended Learning Path
+
+#### Phase 1: Start with Expo (Easiest)
+
+```bash
+# 1. Create Expo project
+npx create-expo-app LearnRN
+cd LearnRN
+
+# 2. Start development
+npx expo start
+
+# 3. Test on physical device (scan QR code with Expo Go app)
+# Download "Expo Go" from Play Store/App Store
+
+# 4. Practice permissions
+npx expo install expo-camera expo-location expo-notifications
+# Implement permission requests as shown in "Expo Alternative" sections
+
+# 5. Build APK using cloud (no Android Studio needed!)
+npm install -g eas-cli
+eas login
+eas build:configure
+eas build --platform android --profile preview
+```
+
+**Why this works:**
+- ✅ No Android Studio needed (uses EAS cloud builds)
+- ✅ 8GB RAM is plenty for Expo development
+- ✅ Fast iteration with Expo Go app
+- ✅ Learn core concepts quickly
+
+#### Phase 2: Understand Bare React Native (Learning)
+
+```bash
+# 1. Create bare React Native project (just to explore)
+npx react-native init LearnRNBare
+cd LearnRNBare
+
+# 2. Install Android SDK command-line tools (lightweight)
+# Download from: https://developer.android.com/studio#command-tools
+# Extract to ~/Android/cmdline-tools (~100MB vs 6GB)
+
+# 3. Set environment variables
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+
+# 4. Install minimal SDK
+sdkmanager --licenses
+sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+
+# 5. Build APK (works without Android Studio)
+cd android && ./gradlew assembleDebug
+
+# 6. Compare with Expo approach
+# - See how android/ and ios/ folders differ
+# - Understand native configuration files
+# - Learn about AndroidManifest.xml and Info.plist
+```
+
+**Why this works:**
+- ✅ Command-line tools only ~500MB (vs 6GB for Android Studio)
+- ✅ Same build output as Android Studio
+- ✅ Understand the "standard" way
+- ✅ 8GB RAM sufficient for command-line builds
+
+#### Phase 3: Explore Both Workflows
+
+**Use Expo for:**
+- Daily development (faster iteration)
+- Testing features quickly
+- Building in the cloud
+- Deploying to real users
+
+**Use Bare React Native for:**
+- Learning native configuration
+- Understanding AndroidManifest.xml / Info.plist
+- Practicing Gradle builds
+- Exploring native modules
+
+### Your Ideal Setup (8GB RAM)
+
+```
+Development Machine (8GB RAM):
+├── VS Code (lightweight IDE)
+├── Node.js & npm
+├── Expo CLI (for daily work)
+├── EAS CLI (for cloud builds)
+├── Android SDK command-line tools (~500MB, optional for learning)
+├── Git
+└── Physical Android device (for testing)
+
+NO NEED FOR:
+❌ Android Studio (~6GB)
+❌ Android Emulator (RAM-heavy)
+❌ Xcode (macOS only, ~15GB)
+```
+
+### Build Workflow for 8GB RAM
+
+**Option 1: EAS Build (Recommended)**
+```bash
+# No Android Studio, builds in cloud
+eas build --platform android
+# Wait 10-15 minutes, download APK
+# Install on physical device
+```
+
+**Option 2: Command-Line Tools (For Learning)**
+```bash
+# Uses command-line SDK (~500MB)
+cd android && ./gradlew assembleDebug
+# Takes 2-5 minutes locally
+# More RAM-efficient than Android Studio
+```
+
+### Learning Both Approaches
+
+**Expo App Structure:**
+```
+my-expo-app/
+├── app.json          # Expo configuration
+├── App.js            # Main app file
+├── package.json
+└── assets/
+```
+
+**Bare React Native Structure:**
+```
+my-bare-app/
+├── android/          # Native Android code
+│   └── app/
+│       └── src/main/
+│           └── AndroidManifest.xml
+├── ios/              # Native iOS code
+│   └── YourApp/
+│       └── Info.plist
+├── App.js
+└── package.json
+```
+
+**Key Learning:**
+- Expo hides `android/` and `ios/` folders
+- Bare React Native exposes them for full control
+- EAS Build can build Expo apps without local SDKs
+- Both use same JavaScript/React code
+- Native features work in both (just different APIs)
+
+### Next Steps for You
+
+1. **Week 1**: Use Expo, practice permissions, storage
+2. **Week 2**: Build APK with EAS (cloud build)
+3. **Week 3**: Create bare React Native project, explore native folders
+4. **Week 4**: Install command-line SDK, build locally (lightweight)
+5. **Week 5+**: Compare both approaches, understand trade-offs
+
+**Resources Specific to Your Setup:**
+- Expo Docs: https://docs.expo.dev/
+- EAS Build: https://docs.expo.dev/build/introduction/
+- Android SDK CLI: https://developer.android.com/studio/command-line
+- Command-line tools guide: https://developer.android.com/studio/intro/update#sdk-manager
 
 ---
 
