@@ -168,7 +168,8 @@ const requestNotificationPermission = async () => {
     const result = await request(PERMISSIONS.IOS.NOTIFICATIONS);
     return result === RESULTS.GRANTED;
   } else {
-    // Android 13+ requires POST_NOTIFICATIONS permission
+    // Android 13+ (API 33+) requires POST_NOTIFICATIONS permission
+    // For older versions, notifications work without explicit permission
     const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
     return result === RESULTS.GRANTED;
   }
@@ -1061,12 +1062,10 @@ Reactotron.log('Hello world!');
 
 ### 4. **Performance Monitor**
 
-```javascript
-import { PerformanceMonitor } from 'react-native';
-
-// Shows FPS overlay in dev mode
-// Shake device → "Show Perf Monitor"
-```
+Access the Performance Monitor in development mode:
+- Shake the device (or press Cmd+D on iOS simulator / Cmd+M on Android emulator)
+- Select "Show Perf Monitor" from the dev menu
+- Shows FPS, memory usage, and JS/UI thread performance
 
 ### 5. **Logcat & Console**
 
