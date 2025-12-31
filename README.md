@@ -113,6 +113,7 @@ Add permissions to `android/app/src/main/AndroidManifest.xml`:
 <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+<!-- POST_NOTIFICATIONS: Only required for Android 13+ (API 33+) -->
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 ```
 
