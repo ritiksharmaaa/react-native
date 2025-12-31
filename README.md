@@ -406,7 +406,7 @@ const requestContactsPermission = async () => {
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
       [
@@ -608,15 +608,14 @@ If you have **8GB RAM or less** and can't install Android Studio, you can use An
 
 ```bash
 # Download SDK command-line tools
-# Visit: https://developer.android.com/studio#command-tools
+# Visit: https://developer.android.com/studio#command-line-tools
 # Download "Command line tools only" (~100MB vs 4-6GB for Android Studio)
 
 # Extract to a location, e.g., ~/Android/cmdline-tools
 
 # Set environment variables in ~/.bashrc or ~/.zshrc
 export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 ```
 
 **Step 2: Install Required SDK Packages**
@@ -652,6 +651,7 @@ cd android
 - ❌ No visual IDE (use VS Code instead)
 - ❌ No emulator GUI (can use physical device)
 - ❌ More command-line work
+- ❌ Requires manual configuration and troubleshooting vs Android Studio's integrated tools
 
 ---
 
@@ -1670,12 +1670,12 @@ npx react-native init LearnRNBare
 cd LearnRNBare
 
 # 2. Install Android SDK command-line tools (lightweight)
-# Download from: https://developer.android.com/studio#command-tools
+# Download from: https://developer.android.com/studio#command-line-tools
 # Extract to ~/Android/cmdline-tools (~100MB vs 6GB)
 
 # 3. Set environment variables
 export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
 # 4. Install minimal SDK
 sdkmanager --licenses
